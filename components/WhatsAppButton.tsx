@@ -1,1 +1,24 @@
-export default function WhatsAppButton(){return <a className="whatsapp-float" href="https://wa.me/918087995062" target="_blank" aria-label="Chat with AREEJ on WhatsApp">WhatsApp</a>}
+export default function WhatsAppButton() {
+  return (
+    <a
+      className="whatsapp-float"
+      href="https://wa.me/918087995062"
+      target="_blank"
+      rel="noreferrer"
+      aria-label="WhatsApp"
+    >
+      <span className="whatsapp-pulse-ring" aria-hidden="true" />
+      <span className="whatsapp-green-lining" aria-hidden="true" />
+      <svg
+        viewBox="0 0 24 24"
+        width="26"
+        height="26"
+        fill="#25d366"
+        aria-hidden="true"
+        className="whatsapp-svg"
+      >
+        <path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.978-.276-.1-.476-.15-.676.15-.2.3-.776.978-.952 1.178-.176.2-.351.226-.652.075-.301-.15-1.27-.468-2.42-1.493-.894-.798-1.498-1.784-1.674-2.085-.176-.3-.019-.462.132-.612.135-.135.301-.351.451-.526.151-.176.201-.301.301-.501.101-.2.05-.376-.025-.526-.075-.15-.676-1.63-.927-2.233-.244-.587-.492-.507-.676-.516l-.576-.01c-.2 0-.526.075-.802.376-.276.3-1.052 1.028-1.052 2.508 0 1.48 1.077 2.909 1.228 3.109.15.2 2.119 3.235 5.134 4.538.717.31 1.278.495 1.714.634.721.23 1.378.197 1.897.12.578-.087 1.78-.727 2.03-1.429.251-.702.251-1.304.176-1.429-.076-.125-.276-.2-.577-.35zM12 2a10 10 0 0 0-8.6 15.1L2 22l4.9-1.4A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.9.8-3-.2-.3a8.2 8.2 0 1 1 7 3.8z" />
+      </svg>
+    </a>
+  );
+}

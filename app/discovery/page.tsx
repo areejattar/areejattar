@@ -11,7 +11,6 @@ export default function Page() {
   return (
     <main className="theme-discovery collection-page">
       <section className="collection-hero discovery-hero">
-        <div className="collection-art" aria-hidden="true" />
         <div className="collection-copy">
           <p className="eyebrow">AREEJ / Discovery</p>
           <h1>Find your way in.</h1>

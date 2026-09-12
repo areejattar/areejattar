@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from "react";
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
-  const headerRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const sync = () =>
@@ -52,40 +52,54 @@ export default function Header() {
   ];
 
   return (
-    <header className="site-header" ref={headerRef}>
-      <Link
-        href="/"
-        className="brand-lockup"
-        aria-label="AREEJ Home"
-        onClick={() => setOpen(false)}
-      >
-        <span className="header-logo">
-          <Image src="/images/areej-logo.png" alt="AREEJ logo" fill sizes="40px" />
-        </span>
-        <span className="brand-name">AREEJ</span>
-      </Link>
-      <nav className={open ? "desktop-nav mobile-open" : "desktop-nav"}>
-        {links.map(([n, h]) => (
-          <Link key={h} href={h} onClick={() => setOpen(false)}>
-            {n}
-          </Link>
-        ))}
+    <>
+      {open && (
+        <div
+          className="mobile-nav-backdrop"
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      <header className="site-header" ref={headerRef}>
         <Link
-          href="/order-enquiry"
-          className="order-link"
+          href="/"
+          className="brand-lockup"
+          aria-label="AREEJ Home"
           onClick={() => setOpen(false)}
         >
-          Place Order {count > 0 && <span>{count}</span>}
+          <span className="header-logo">
+            <Image src="/images/areej-logo.png" alt="AREEJ logo" fill sizes="40px" />
+          </span>
+          <span className="brand-name">AREEJ</span>
         </Link>
-      </nav>
-      <button
-        className="menu-button"
-        aria-label={open ? "Close menu" : "Open menu"}
-        aria-expanded={open}
-        onClick={() => setOpen(prev => !prev)}
-      >
-        {open ? "✕" : "☰"}
-      </button>
-    </header>
+        <nav className={`desktop-nav ${open ? "mobile-open" : ""}`}>
+          {links.map(([n, h]) => (
+            <Link key={h} href={h} onClick={() => setOpen(false)}>
+              {n}
+            </Link>
+          ))}
+          <Link
+            href="/order-enquiry"
+            className="order-link"
+            onClick={() => setOpen(false)}
+          >
+            Place Order {count > 0 && <span>{count}</span>}
+          </Link>
+        </nav>
+        <button
+          className={`menu-button ${open ? "active" : ""}`}
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          onClick={() => setOpen((prev) => !prev)}
+        >
+          <span className="menu-bar-box">
+            <span className="menu-bar bar-top" />
+            <span className="menu-bar bar-mid" />
+            <span className="menu-bar bar-bot" />
+          </span>
+        </button>
+      </header>
+    </>
   );
 }
+
