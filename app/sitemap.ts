@@ -1,0 +1,1 @@
+import {MetadataRoute} from "next"; import {products} from "@/data/products"; export default function sitemap():MetadataRoute.Sitemap{const base="https://www.areejattar.in";return ["/","/attar","/perfume","/discovery","/find-your-fragrance","/contact","/order-enquiry",...products.map(p=>`/product/${p.slug}`)].map(path=>({url:base+path,lastModified:new Date()}))}
