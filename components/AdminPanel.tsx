@@ -10,6 +10,11 @@ const defaultDiscovery:Record<"attar"|"perfume",DiscoveryConfig>={
   perfume:{enabled:true,options:[3,5],sizes:["5 ML","10 ML"]}
 };
 
+function getMinPrice(prices?: Record<string, number | null>, fallback?: number | null): number {
+  const vals = Object.values(prices || {}).filter((x): x is number => typeof x === "number");
+  return vals.length ? Math.min(...vals) : (fallback ?? 0);
+}
+
 export default function AdminPanel({authenticated}:{authenticated:boolean}){
   const [password,setPassword]=useState(""); const [ok,setOk]=useState(authenticated); const [items,setItems]=useState<any[]>([]); const [q,setQ]=useState(""); const [editing,setEditing]=useState<any|null>(null); const [tab,setTab]=useState("products");
   const [featured,setFeatured]=useState<string[]>([]); const [best,setBest]=useState<string[]>([]); const [finder,setFinder]=useState<string[]>([]);
@@ -54,7 +59,7 @@ export default function AdminPanel({authenticated}:{authenticated:boolean}){
   const setD=(patch:Partial<DiscoveryConfig>)=>setDiscovery(prev=>({...prev,[discoveryTab]:{...prev[discoveryTab],...patch}}));
   return <main className="admin-page"><div className="admin-top"><div><p className="eyebrow">AREEJ / Admin</p><h1>Control room</h1><p>Manage catalogue, merchandising and order rules.</p></div><div><button onClick={persist} className="gold-button">Save changes</button> <button onClick={logout} className="outline-button">Sign out</button></div></div>
     <div className="admin-tabs"><button className={tab==="products"?"selected":""} onClick={()=>setTab("products")}>Products</button><button className={tab==="signatures"?"selected":""} onClick={()=>setTab("signatures")}>Explore the Signatures</button><button className={tab==="bestsellers"?"selected":""} onClick={()=>setTab("bestsellers")}>Best Sellers</button><button className={tab==="finder"?"selected":""} onClick={()=>setTab("finder")}>Find Your Fragrance</button><button className={tab==="discovery"?"selected":""} onClick={()=>setTab("discovery")}>Discovery Sets</button><button className={tab==="orders"?"selected":""} onClick={()=>setTab("orders")}>Order Rules</button></div>
-    {tab==="products"&&<><div className="admin-toolbar"><input placeholder="Search catalogue..." value={q} onChange={e=>setQ(e.target.value)}/><span>{items.length} products</span></div><div className="admin-table">{filtered.map(p=><div className="admin-row" key={p.slug}><div><strong>{p.name.replace(/^Areej /,"")}</strong><small>{p.sku} · {p.collection}</small></div><div>From ₹{Math.min(...Object.values(p.prices||{}).filter((x:any)=>typeof x==="number"))}</div><button onClick={()=>setEditing({...p})}>Edit</button></div>)}</div></>}
+    {tab==="products"&&<><div className="admin-toolbar"><input placeholder="Search catalogue..." value={q} onChange={e=>setQ(e.target.value)}/><span>{items.length} products</span></div><div className="admin-table">{filtered.map(p=><div className="admin-row" key={p.slug}><div><strong>{p.name.replace(/^Areej /,"")}</strong><small>{p.sku} · {p.collection}</small></div><div>From ₹{getMinPrice(p.prices, p.price)}</div><button onClick={()=>setEditing({...p})}>Edit</button></div>)}</div></>}
     {tab==="signatures"&&<div className="merch-grid"><div><h2>Explore the Signatures</h2><p>Select which products appear in the homepage signature collection. The first 6 selected are displayed.</p></div>{merch(featured,setFeatured)}</div>}
     {tab==="bestsellers"&&<div className="merch-grid"><div><h2>Best Sellers</h2><p>Select which products appear in the homepage best-seller section. The first 4 selected are displayed.</p></div>{merch(best,setBest)}</div>}
     {tab==="finder"&&<div className="merch-grid"><div><h2>Explore First</h2><p>Select the products that the fragrance finder should prioritise.</p></div>{merch(finder,setFinder)}</div>}

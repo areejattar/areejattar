@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { products } from "@/data/products";
+import { products, type Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 
 export default function Finder() {
@@ -12,12 +12,12 @@ export default function Finder() {
     if (saved) setAll(saved);
   }, []);
   const options = Array.from(new Set(all.flatMap(p => p.notes))).slice(0, 18);
-  const selectedIds = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("areej-finder") || "[]") : [];
   const result = useMemo(() => {
-    const pool = all.filter(p => p.status === "published").filter(p => pref === "all" || p.notes.includes(pref)).filter(p => mood === "all" || p.collection === mood);
-    const curated = selectedIds.length ? selectedIds.map((id: string) => pool.find(p => p.slug === id)).filter(Boolean) : pool;
+    const selectedIds: string[] = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("areej-finder") || "[]") : [];
+    const pool: Product[] = all.filter(p => p.status === "published").filter(p => pref === "all" || p.notes.includes(pref)).filter(p => mood === "all" || p.collection === mood);
+    const curated: Product[] = selectedIds.length ? selectedIds.map((id: string) => pool.find(p => p.slug === id)).filter((p): p is Product => Boolean(p)) : pool;
     return curated.slice(0, 4);
-  }, [mood, pref, all, selectedIds]);
+  }, [mood, pref, all]);
 
   return (
     <main className="finder-page">
