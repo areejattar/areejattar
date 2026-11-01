@@ -20,7 +20,7 @@ const gateways = [
   {
     pillar: "Pillar II",
     tag: "Modern Extraits",
-    title: "Fine Perfume",
+    title: "Modern Perfume",
     desc: "Contemporary extrait profiles across global modern fragrance culture.",
     notes: "Bergamot · French Lavender · Cardamom",
     cta: "Explore Perfumes →",

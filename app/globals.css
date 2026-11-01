@@ -1198,3 +1198,7 @@
   }
 }
 
+
+/* Cart controls */
+.cart-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:28px 0 0}.cart-heading h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;margin:0}.clear-cart-button{min-height:40px;padding:0 16px;font-size:12px}
+@media(max-width:600px){.cart-heading{align-items:flex-start}.cart-heading h2{font-size:26px}.clear-cart-button{min-height:38px;padding:0 12px}}

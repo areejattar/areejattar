@@ -20,6 +20,9 @@ export default function OrderEnquiry() {
   function persist(a: any[]) { setItems(a); localStorage.setItem("areej-enquiry", JSON.stringify(a)); window.dispatchEvent(new Event("areej-cart")); }
   function update(i: number, d: number) { const a = [...items]; a[i].qty = Math.max(1, a[i].qty + d); persist(a); }
   function remove(i: number) { persist(items.filter((_, x) => x !== i)); }
+  function clearCart() {
+    if (window.confirm("Are you sure you want to clear your entire cart?")) persist([]);
+  }
   const subtotal = useMemo(() => items.reduce((n, x) => n + Number(x.price || 0) * Number(x.qty || 0), 0), [items]);
   const hasMainItems = items.some(x => !x.discoverySet && !x.trialMode);
   const hasTrialItems = items.some(x => Boolean(x.discoverySet || x.trialMode));
@@ -32,6 +35,7 @@ export default function OrderEnquiry() {
 
   return <main className="inner-page order-page"><p className="eyebrow">Your order</p><h1>Place order</h1>
     {items.length === 0 ? <><p>Your order is empty. Browse the catalogue and add fragrances to begin.</p><Link href="/perfume" className="gold-button">Browse fragrances</Link></> : <>
+      <div className="cart-heading"><h2>Your items</h2><button type="button" className="outline-button clear-cart-button" onClick={clearCart}>Clear Cart</button></div>
       <div className="enquiry-list">{items.map((x, i) => <div className="enquiry-line" key={x.id}><div><strong>{x.name}</strong><small>{x.size} · ₹{Number(x.price || 0).toLocaleString("en-IN")} each</small></div><span><button onClick={() => update(i, -1)}>−</button>{x.qty}<button onClick={() => update(i, 1)}>+</button><button onClick={() => remove(i)}>Remove</button></span></div>)}</div>
       {settings.trial3mlEnabled && <section className="cart-trial"><div><p className="eyebrow">Try before committing</p><h3>Prefer a 3 ML trial?</h3><p>Add a smaller trial where available. Trial pricing is controlled from Admin.</p></div><div className="trial-grid">{products.filter(p => p.status === "published").slice(0, 4).map(p => <button key={p.slug} onClick={() => { const price = settings.trial3mlPrice; const a = [...items, { id: p.slug + "-3 ML", slug: p.slug, name: p.name, size: "3 ML Trial", qty: 1, image: p.image, price }]; persist(a); }}>{p.name.replace(/^Areej /,"")} <small>{settings.trial3mlPrice != null ? `₹${settings.trial3mlPrice}` : "Price in admin"}</small></button>)}</div></section>}
       {hasTrialItems && !hasMainItems && <div className="trial-only-note">✦ No minimum order value on trials. Add a regular product whenever you are ready for a full-size order.</div>}
