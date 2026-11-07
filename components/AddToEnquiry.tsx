@@ -8,14 +8,30 @@ export default function AddToEnquiry({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const price = (product.prices || {})[size] ?? product.price;
+  const sku = product.variantSkus?.[size] || "";
 
   function add() {
     const key = "areej-enquiry";
     const items = JSON.parse(localStorage.getItem(key) || "[]");
     const id = product.slug + "-" + size;
     const found = items.find((x: any) => x.id === id);
-    if (found) found.qty += qty;
-    else items.push({ id, slug: product.slug, name: product.name, size, qty, image: product.image, price });
+    if (found) {
+      found.qty += qty;
+      found.price = price;
+      if (sku) found.sku = sku;
+      else delete found.sku;
+    } else {
+      items.push({
+        id,
+        slug: product.slug,
+        name: product.name,
+        size,
+        qty,
+        image: product.image,
+        price,
+        ...(sku ? { sku } : {}),
+      });
+    }
     localStorage.setItem(key, JSON.stringify(items));
     window.dispatchEvent(new Event("areej-cart"));
     setAdded(true);

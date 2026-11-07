@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { Product } from "@/data/products";
@@ -57,16 +56,18 @@ export default function ProductCard({ product }: Props) {
           <span className="card-badge">{product.collection}</span>
         )}
 
-        {product.image.startsWith("data:") ? (
-          <img src={product.image} alt={product.name} />
-        ) : (
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            sizes="(max-width: 600px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
-        )}
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
       </Link>
 
       <div className="product-info">

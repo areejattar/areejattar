@@ -3,7 +3,10 @@ export type ProductStatus = "published" | "draft";
 export type Product = {
   slug: string; sku: string; sku6: string; sku12: string; name: string;
   category: string; faq: string; collection: Collection; notes: string[];
-  sizeOptions: string[]; prices: Record<string, number | null>; price: number | null; status: ProductStatus; image: string; featured?: boolean; bestSeller?: boolean;
+  sizeOptions: string[]; prices: Record<string, number | null>; price: number | null;
+  /** Actual database SKU for each selectable size, e.g. { "100 ML": "..." }. */
+  variantSkus?: Record<string, string>;
+  status: ProductStatus; image: string; featured?: boolean; bestSeller?: boolean;
 };
 export const products: Product[] = [
   {

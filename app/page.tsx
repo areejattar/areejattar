@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import { products as seed, type Product } from "@/data/products";
+import type { Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
+import { fetchPublicCatalog, mapPublicProducts } from "@/lib/public-catalogue";
 
 const gateways = [
   {
@@ -39,29 +40,26 @@ const gateways = [
   }
 ];
 
-function select(
+function selectByFormat(
   ids: string[],
   all: Product[],
   fallback: Product[],
-  limit: number
+  format: "attar" | "perfume",
+  limit: number,
+  explicitSelection: boolean
 ): Product[] {
-  const chosen = ids.length
-    ? (ids
-        .map((id) => all.find((p) => p.slug === id))
-        .filter(Boolean) as Product[])
-    : fallback;
-  return chosen.filter((p) => p.status !== "draft").slice(0, limit);
+  const pool = all.filter((p) => p.collection === format && p.status !== "draft");
+  const chosen = explicitSelection
+    ? ids.map((id) => pool.find((p) => p.slug === id)).filter(Boolean) as Product[]
+    : fallback.filter((p) => p.collection === format);
+  return chosen.slice(0, limit);
 }
 
 export default function Home() {
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>(seed);
-  const [featured, setFeatured] = useState<Product[]>(
-    seed.filter((p) => p.featured).slice(0, 6)
-  );
-  const [best, setBest] = useState<Product[]>(
-    seed.filter((p) => p.bestSeller).slice(0, 4)
-  );
+  const [products, setProducts] = useState<Product[]>([]);
+  const [featured, setFeatured] = useState<Product[]>([]);
+  const [best, setBest] = useState<Product[]>([]);
   const [activeGateway, setActiveGateway] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
@@ -94,35 +92,32 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const saved = JSON.parse(
-      localStorage.getItem("areej-admin-products") || "null"
-    );
-    const activeProducts: Product[] = saved || seed;
-    setProducts(activeProducts);
+    let cancelled = false;
+    fetchPublicCatalog()
+      .then((data) => {
+        if (cancelled) return;
+        const activeProducts = mapPublicProducts(data);
+        const m = data.config?.merchandising || {};
+        setProducts(activeProducts);
 
-    const ids: string[] = JSON.parse(
-      localStorage.getItem("areej-featured") || "[]"
-    );
-    const bids: string[] = JSON.parse(
-      localStorage.getItem("areej-best") || "[]"
-    );
+        const featuredAttarIds = Array.isArray(m.featuredAttar) ? m.featuredAttar : (m.featured || []);
+        const featuredPerfumeIds = Array.isArray(m.featuredPerfume) ? m.featuredPerfume : [];
+        const bestAttarIds = Array.isArray(m.bestAttar) ? m.bestAttar : (m.best || []);
+        const bestPerfumeIds = Array.isArray(m.bestPerfume) ? m.bestPerfume : [];
+        const fallbackFeatured = activeProducts.filter((p) => p.featured);
+        const fallbackBest = activeProducts.filter((p) => p.bestSeller);
 
-    setFeatured(
-      select(
-        ids,
-        activeProducts,
-        activeProducts.filter((p) => p.featured),
-        6
-      )
-    );
-    setBest(
-      select(
-        bids,
-        activeProducts,
-        activeProducts.filter((p) => p.bestSeller),
-        4
-      )
-    );
+        setFeatured([
+          ...selectByFormat(featuredAttarIds, activeProducts, fallbackFeatured, "attar", 6, Array.isArray(m.featuredAttar) || Array.isArray(m.featured)),
+          ...selectByFormat(featuredPerfumeIds, activeProducts, fallbackFeatured, "perfume", 6, Array.isArray(m.featuredPerfume)),
+        ].slice(0, 6));
+        setBest([
+          ...selectByFormat(bestAttarIds, activeProducts, fallbackBest, "attar", 4, Array.isArray(m.bestAttar) || Array.isArray(m.best)),
+          ...selectByFormat(bestPerfumeIds, activeProducts, fallbackBest, "perfume", 4, Array.isArray(m.bestPerfume)),
+        ].slice(0, 4));
+      })
+      .catch((error) => console.error("Unable to load published homepage catalogue:", error));
+    return () => { cancelled = true; };
   }, []);
 
   // Scroll-Triggered Reveal Animations Observer
@@ -299,7 +294,7 @@ export default function Home() {
         </div>
         <div className="product-grid scroll-stagger">
           {featured.map((p) => (
-            <ProductCard key={p.slug} product={p} />
+            <ProductCard key={`${p.slug}-${p.collection}`} product={p} />
           ))}
         </div>
       </section>
@@ -317,7 +312,7 @@ export default function Home() {
         </div>
         <div className="product-grid scroll-stagger">
           {best.map((p) => (
-            <ProductCard key={p.slug} product={p} />
+            <ProductCard key={`${p.slug}-${p.collection}`} product={p} />
           ))}
         </div>
       </section>

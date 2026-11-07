@@ -1202,3 +1202,56 @@
 /* Cart controls */
 .cart-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:28px 0 0}.cart-heading h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;margin:0}.clear-cart-button{min-height:40px;padding:0 16px;font-size:12px}
 @media(max-width:600px){.cart-heading{align-items:flex-start}.cart-heading h2{font-size:26px}.clear-cart-button{min-height:38px;padding:0 12px}}
+
+
+/* Admin editor: render above the entire site (including the footer) and keep
+   the complete form reachable on short screens. The modal is portalled to body. */
+.admin-editor-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10000 !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  padding: 24px 16px !important;
+  isolation: isolate;
+}
+.admin-editor-modal .admin-editor {
+  position: relative;
+  z-index: 10001;
+  width: min(760px, 100%) !important;
+  max-height: none !important;
+  min-height: 0;
+  margin: auto 0;
+  overflow: visible !important;
+  align-content: start;
+  box-sizing: border-box;
+}
+.admin-editor-modal .modal-header {
+  position: sticky;
+  top: -30px;
+  z-index: 2;
+  background: #fff;
+  padding: 8px 0 12px;
+}
+.admin-editor-modal .editor-actions {
+  position: sticky;
+  bottom: -30px;
+  z-index: 2;
+  background: #fff;
+  padding: 14px 0 8px;
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 600px) {
+  .admin-editor-modal { padding: 10px !important; }
+  .admin-editor-modal .admin-editor {
+    width: 100% !important;
+    padding: 20px !important;
+    margin: 0;
+  }
+  .admin-editor-modal .modal-header { top: -20px; }
+  .admin-editor-modal .editor-actions { bottom: -20px; }
+}
